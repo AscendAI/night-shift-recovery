@@ -13,6 +13,10 @@ const segmentColors: Record<TimelineSegment["type"], string> = {
   caffeine: "bg-emerald-500",
   work: "bg-amber-500",
   "light-control": "bg-orange-400",
+  "metabolic-green": "bg-green-500",
+  "metabolic-yellow": "bg-yellow-500",
+  "metabolic-red": "bg-red-600",
+  "vampire-mode": "bg-purple-900",
 }
 
 const segmentLabels: Record<TimelineSegment["type"], string> = {
@@ -20,6 +24,10 @@ const segmentLabels: Record<TimelineSegment["type"], string> = {
   caffeine: "Caffeine OK",
   work: "Shift",
   "light-control": "Light Control",
+  "metabolic-green": "Complex Carbs",
+  "metabolic-yellow": "Protein/Fats",
+  "metabolic-red": "Fasting",
+  "vampire-mode": "Vampire Mode",
 }
 
 export function Timeline({ segments, timelineStart, timelineEnd }: TimelineProps) {

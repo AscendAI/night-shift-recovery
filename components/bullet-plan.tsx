@@ -1,7 +1,7 @@
 "use client"
 
 import type { SleepPlan } from "@/lib/sleep-plan"
-import { Coffee, Moon, Sun, Glasses, AlertTriangle, Clock } from "lucide-react"
+import { Coffee, Moon, Sun, Glasses, AlertTriangle, Clock, Utensils } from "lucide-react"
 
 interface BulletPlanProps {
   plan: SleepPlan
@@ -17,6 +17,13 @@ export function BulletPlan({ plan }: BulletPlanProps) {
       description: 'Take a 90-minute nap to "bank" sleep before your shift.',
     },
     {
+      time: plan.metabolic.green.startTime,
+      icon: Utensils,
+      iconColor: "text-green-400",
+      title: "Green Zone: Eat Complex Carbs",
+      description: "Start your wake window with slow-release energy.",
+    },
+    {
       time: plan.shiftStartTime,
       icon: Clock,
       iconColor: "text-amber-400",
@@ -24,26 +31,34 @@ export function BulletPlan({ plan }: BulletPlanProps) {
       description: "Begin your work shift.",
     },
     {
-      time: `${plan.caffeineWindow.startTime} – ${plan.caffeineWindow.endTime}`,
-      icon: Coffee,
-      iconColor: "text-emerald-400",
-      title: "Caffeine OK (Green Zone)",
-      description: "Small, regular doses are better than one huge hit.",
+      time: plan.metabolic.yellow.startTime,
+      icon: Utensils,
+      iconColor: "text-yellow-400",
+      title: "Yellow Zone: Protein & Fats",
+      description: "Switch to protein and healthy fats to sustain energy without the crash.",
     },
     {
       time: plan.caffeineCutoff,
       icon: AlertTriangle,
       iconColor: "text-red-400",
-      title: "CAFFEINE CUTOFF (Red Zone)",
-      description: "Stop caffeine here to protect your post-shift sleep.",
+      title: "CAFFEINE HARD STOP",
+      description: "No more coffee. 6 hours before sleep to prevent 'tired but wired'.",
       highlight: true,
     },
     {
-      time: plan.shiftEndTime,
+      time: plan.metabolic.red.startTime,
+      icon: Utensils,
+      iconColor: "text-red-400",
+      title: "Red Zone: FASTING MODE",
+      description: "Stop eating 3 hours before sleep to avoid bloating and improve rest.",
+    },
+    {
+      time: plan.vampireMode.startTime,
       icon: Glasses,
-      iconColor: "text-orange-400",
-      title: "Shift Ends + Light Control",
-      description: "Wear sunglasses or reduce bright light on the way home.",
+      iconColor: "text-purple-400",
+      title: "VAMPIRE MODE: Sunglasses ON",
+      description: "Critical! Protect your melatonin production 30 mins before shift ends.",
+      highlight: true,
     },
     {
       time: `${plan.mainSleep.startTime} – ${plan.mainSleep.endTime}`,
