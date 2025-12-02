@@ -251,6 +251,9 @@ export default function RosterToSleepPage() {
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-slate-300 hover:text-white underline underline-offset-4"
+                        onClick={() => {
+                            posthog.capture("clicked-company-link")
+                        }}
                     >
                         Ascend AI
                     </a>
