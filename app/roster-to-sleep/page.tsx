@@ -111,7 +111,7 @@ export default function RosterToSleepPage() {
                         Translate your shift schedule into a science-backed protocol for sleep and energy management.
                     </p>
                     <p className="text-sm text-slate-500">
-                        Designed for Nocturnals and NightShift
+                        Designed for Nocturnals and NightShifters
                     </p>
                 </div>
 
