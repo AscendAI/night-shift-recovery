@@ -55,8 +55,7 @@ export function LeadCapture() {
                 <h3 className="text-xl sm:text-2xl font-bold text-white">Tired of Calculating it everytime?</h3>
 
                 <p className="text-slate-400 max-w-md mx-auto">
-                    I’m building an app that automates all of this. It syncs your roster, plans your sleep windows, and tells you
-                    exactly when to cut caffeine so you don't feel like a zombie.
+                    I’m building an app that automates all of this. It syncs your roster, plans your sleep windows, and provides a science-backed protocol for energy management.
                 </p>
 
                 {status === "success" ? (
