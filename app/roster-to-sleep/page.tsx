@@ -15,7 +15,10 @@ import { generatePlan, generateTimelineSegments, parseTimeToMinutes, type SleepP
 import posthog from "posthog-js"
 
 export default function RosterToSleepPage() {
-    const [shiftDate, setShiftDate] = useState("")
+    const [shiftDate, setShiftDate] = useState(() => {
+        const today = new Date()
+        return today.toISOString().split('T')[0]
+    })
     const [shiftStart, setShiftStart] = useState("")
     const [shiftEnd, setShiftEnd] = useState("")
     const [shiftLabel, setShiftLabel] = useState("")
