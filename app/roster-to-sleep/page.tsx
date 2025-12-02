@@ -15,10 +15,8 @@ import { generatePlan, generateTimelineSegments, parseTimeToMinutes, type SleepP
 import posthog from "posthog-js"
 
 export default function RosterToSleepPage() {
-    const [shiftDate, setShiftDate] = useState("")
     const [shiftStart, setShiftStart] = useState("")
     const [shiftEnd, setShiftEnd] = useState("")
-    const [shiftLabel, setShiftLabel] = useState("")
     const [plan, setPlan] = useState<SleepPlan | null>(null)
     const [error, setError] = useState("")
     const [isLoading, setIsLoading] = useState(false)
@@ -52,8 +50,6 @@ export default function RosterToSleepPage() {
         posthog.capture('shift_details_submitted', {
             shiftStart,
             shiftEnd,
-            shiftDate: shiftDate || null,
-            shiftLabel: shiftLabel || null,
             timestamp: new Date().toISOString()
         })
 
@@ -85,10 +81,8 @@ export default function RosterToSleepPage() {
     }
 
     const handleReset = () => {
-        setShiftDate("")
         setShiftStart("")
         setShiftEnd("")
-        setShiftLabel("")
         setPlan(null)
         setError("")
     }
@@ -125,35 +119,6 @@ export default function RosterToSleepPage() {
                     </CardHeader>
                     <CardContent className="space-y-6">
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            {/* Shift Date */}
-                            <div className="space-y-2">
-                                <Label htmlFor="shift-date" className="text-slate-300">
-                                    Shift Date <span className="text-slate-500">(optional)</span>
-                                </Label>
-                                <Input
-                                    id="shift-date"
-                                    type="date"
-                                    value={shiftDate}
-                                    onChange={(e) => setShiftDate(e.target.value)}
-                                    className="bg-slate-800 border-slate-700 text-white"
-                                />
-                            </div>
-
-                            {/* Shift Label */}
-                            <div className="space-y-2">
-                                <Label htmlFor="shift-label" className="text-slate-300">
-                                    Shift Label <span className="text-slate-500">(optional)</span>
-                                </Label>
-                                <Input
-                                    id="shift-label"
-                                    type="text"
-                                    placeholder="e.g., Night shift"
-                                    value={shiftLabel}
-                                    onChange={(e) => setShiftLabel(e.target.value)}
-                                    className="bg-slate-800 border-slate-700 text-white placeholder:text-slate-500"
-                                />
-                            </div>
-
                             {/* Shift Start Time */}
                             <div className="space-y-2">
                                 <Label htmlFor="shift-start" className="text-slate-300">
@@ -239,13 +204,6 @@ export default function RosterToSleepPage() {
                                         </span>
                                         <span className="text-slate-500">({plan.shiftDurationHours} hours)</span>
                                     </div>
-                                    {(shiftDate || shiftLabel) && (
-                                        <div className="text-sm text-slate-500">
-                                            {shiftLabel && <span>{shiftLabel}</span>}
-                                            {shiftLabel && shiftDate && <span> · </span>}
-                                            {shiftDate && <span>{shiftDate}</span>}
-                                        </div>
-                                    )}
                                 </div>
 
                                 {/* Dashboard Widgets */}
