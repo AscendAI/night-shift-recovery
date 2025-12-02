@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation"
+import RosterToSleepPage from "@/app/roster-to-sleep/page"
 
 export default function Page() {
-    redirect("/roster-to-sleep")
+    return <RosterToSleepPage />
 }
