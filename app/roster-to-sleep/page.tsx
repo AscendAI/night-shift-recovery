@@ -251,6 +251,12 @@ export default function RosterToSleepPage() {
                                 {/* Dashboard Widgets */}
                                 <Dashboard plan={plan} />
 
+                                {/* Bullet Plan */}
+                                <div className="space-y-3">
+                                    <h4 className="text-sm font-medium text-slate-400 uppercase tracking-wide">Step-by-Step Plan</h4>
+                                    <BulletPlan plan={plan} />
+                                </div>
+
                                 {/* Visual Timeline */}
                                 {timelineData && (
                                     <div className="space-y-2">
@@ -262,12 +268,6 @@ export default function RosterToSleepPage() {
                                         />
                                     </div>
                                 )}
-
-                                {/* Bullet Plan */}
-                                <div className="space-y-3">
-                                    <h4 className="text-sm font-medium text-slate-400 uppercase tracking-wide">Step-by-Step Plan</h4>
-                                    <BulletPlan plan={plan} />
-                                </div>
 
                                 {/* Disclaimer */}
                                 <div className="bg-slate-800/50 rounded-lg p-4 text-center">
