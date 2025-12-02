@@ -47,7 +47,7 @@ export default function RosterToSleepPage() {
 
         const delayMs = 3000 + Math.floor(Math.random() * 2000)
         setIsLoading(true)
-        
+
         // Track shift details submission
         posthog.capture('shift_details_submitted', {
             shiftStart,
@@ -56,12 +56,12 @@ export default function RosterToSleepPage() {
             shiftLabel: shiftLabel || null,
             timestamp: new Date().toISOString()
         })
-        
+
         setTimeout(() => {
             try {
                 const generatedPlan = generatePlan(shiftStart, shiftEnd)
                 setPlan(generatedPlan)
-                
+
                 // Track successful plan generation
                 posthog.capture('sleep_plan_generated', {
                     shiftStart,
@@ -71,7 +71,7 @@ export default function RosterToSleepPage() {
                 })
             } catch {
                 setError("Something went wrong. Please check your inputs and try again.")
-                
+
                 // Track plan generation error
                 posthog.capture('sleep_plan_error', {
                     shiftStart,
@@ -106,12 +106,12 @@ export default function RosterToSleepPage() {
                     <div className="inline-flex items-center justify-center w-16 h-16 bg-indigo-500/20 rounded-2xl mb-4">
                         <Moon className="w-8 h-8 text-indigo-400" />
                     </div>
-                    <h1 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">Roster → Sleep Calculator</h1>
+                    <h1 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">The Shift Work Recovery Calculator</h1>
                     <p className="text-lg text-slate-400 max-w-xl mx-auto text-pretty">
-                        Translate your chaotic shift roster into a science-backed sleep + caffeine plan you can use tonight.
+                        Translate your shift schedule into a science-backed protocol for sleep and energy management.
                     </p>
                     <p className="text-sm text-slate-500">
-                        For shift workers: nurses, night-shift staff, emergency workers, etc.
+                        Designed for Nocturnals and NightShift
                     </p>
                 </div>
 
