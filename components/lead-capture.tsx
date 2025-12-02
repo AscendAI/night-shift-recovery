@@ -6,6 +6,7 @@ import { useState } from "react"
 import { Mail, ArrowRight, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import posthog from "posthog-js"
 
 export function LeadCapture() {
     const [email, setEmail] = useState("")
@@ -30,6 +31,12 @@ export function LeadCapture() {
             setErrorMessage("Please enter a valid email address.")
             return
         }
+        posthog.identify(email)
+        // Track waitlist submission
+        posthog.capture('waitlist_submitted', {
+            email: email,
+            timestamp: new Date().toISOString()
+        })
 
         // For now, just log the email - can be replaced with API call later
         console.log("Lead capture email:", email)

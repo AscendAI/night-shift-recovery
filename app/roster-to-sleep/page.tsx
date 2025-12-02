@@ -12,6 +12,7 @@ import { Dashboard } from "@/components/dashboard"
 import { LeadCapture } from "@/components/lead-capture"
 import { Spinner } from "@/components/ui/spinner"
 import { generatePlan, generateTimelineSegments, parseTimeToMinutes, type SleepPlan } from "@/lib/sleep-plan"
+import posthog from "posthog-js"
 
 export default function RosterToSleepPage() {
     const [shiftDate, setShiftDate] = useState("")
@@ -46,12 +47,37 @@ export default function RosterToSleepPage() {
 
         const delayMs = 3000 + Math.floor(Math.random() * 2000)
         setIsLoading(true)
+        
+        // Track shift details submission
+        posthog.capture('shift_details_submitted', {
+            shiftStart,
+            shiftEnd,
+            shiftDate: shiftDate || null,
+            shiftLabel: shiftLabel || null,
+            timestamp: new Date().toISOString()
+        })
+        
         setTimeout(() => {
             try {
                 const generatedPlan = generatePlan(shiftStart, shiftEnd)
                 setPlan(generatedPlan)
+                
+                // Track successful plan generation
+                posthog.capture('sleep_plan_generated', {
+                    shiftStart,
+                    shiftEnd,
+                    shiftDurationHours: generatedPlan.shiftDurationHours,
+                    timestamp: new Date().toISOString()
+                })
             } catch {
                 setError("Something went wrong. Please check your inputs and try again.")
+                
+                // Track plan generation error
+                posthog.capture('sleep_plan_error', {
+                    shiftStart,
+                    shiftEnd,
+                    timestamp: new Date().toISOString()
+                })
             } finally {
                 setIsLoading(false)
             }
