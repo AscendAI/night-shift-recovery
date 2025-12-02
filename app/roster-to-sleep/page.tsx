@@ -240,7 +240,18 @@ export default function RosterToSleepPage() {
         <LeadCapture />
 
         {/* Footer */}
-        <footer className="text-center text-sm text-slate-600 pb-8">Built with ❤️ for shift workers everywhere</footer>
+        <footer className="text-center text-sm text-slate-600 pb-8">
+          Built with ❤️ for shift workers everywhere by
+          {" "}
+          <a
+            href="https://www.ascendai.site"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-slate-300 hover:text-white underline underline-offset-4"
+          >
+            Ascend AI
+          </a>
+        </footer>
       </div>
     </div>
   )
