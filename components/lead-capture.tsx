@@ -52,10 +52,10 @@ export function LeadCapture() {
                     <Mail className="w-6 h-6 text-indigo-400" />
                 </div>
 
-                <h3 className="text-xl sm:text-2xl font-bold text-white">Tired of Calculating it everytime?</h3>
+                <h3 className="text-xl sm:text-2xl font-bold text-white">Coming Soon</h3>
 
                 <p className="text-slate-400 max-w-md mx-auto">
-                    I’m building an app that automates all of this. It syncs your roster, plans your sleep windows, and provides a science-backed protocol for energy management.
+                    I&apos;m turning this logic into an app. Manual calculation is unsustainable long-term. I&apos;m building a tool that syncs this protocol to your calendar automatically and also will send periodic notifications to build the habits and track over time.
                 </p>
 
                 {status === "success" ? (
@@ -79,14 +79,14 @@ export function LeadCapture() {
                             />
                         </div>
                         <Button type="submit" className="bg-indigo-600 hover:bg-indigo-700 text-white h-11 px-6">
-                            Notify Me When It's Ready
+                            Join the Waitlist
                             <ArrowRight className="w-4 h-4 ml-2" />
                         </Button>
                     </form>
                 )}
 
                 {status === "error" && <p className="text-red-400 text-sm">{errorMessage}</p>}
-                <p className="text-xs text-slate-500 mt-2">No spam. Just one email when we launch.</p>
+                <p className="text-xs text-slate-500 mt-2">You can apply to get early access. I&apos;ll email you when the TestFlight link is ready.</p>
             </div>
         </div>
     )

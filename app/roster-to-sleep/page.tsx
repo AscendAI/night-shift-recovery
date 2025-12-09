@@ -100,13 +100,19 @@ export default function RosterToSleepPage() {
                     <div className="inline-flex items-center justify-center w-16 h-16 bg-indigo-500/20 rounded-2xl mb-4">
                         <Moon className="w-8 h-8 text-indigo-400" />
                     </div>
-                    <h1 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">The Shift Work Recovery Calculator</h1>
+                    <h1 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">Circadian Entrainment Tool (T-min Based)</h1>
                     <p className="text-lg text-slate-400 max-w-xl mx-auto text-pretty">
-                        Translate your shift schedule into a science-backed protocol for sleep and energy management.
+                        I couldn&apos;t find a calculator that actually used the &quot;Temperature Minimum&quot; protocol from the Jet Lag episodes, so I coded one. It calculates your specific Light, Caffeine, and Fasting windows to mitigate metabolic damage.
                     </p>
-                    <p className="text-sm text-slate-500">
-                        Designed for Nocturnals and NightShifters
-                    </p>
+                    <div className="mt-8 aspect-video w-full max-w-xl mx-auto rounded-xl overflow-hidden shadow-lg border border-slate-800">
+                        <iframe
+                            className="w-full h-full"
+                            src="https://www.youtube.com/embed/NAATB55oxeQ"
+                            title="YouTube video player"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                        />
+                    </div>
                 </div>
 
                 {/* Input Form */}
@@ -114,7 +120,7 @@ export default function RosterToSleepPage() {
                     <CardHeader>
                         <CardTitle className="text-white flex items-center gap-2">
                             <Zap className="w-5 h-5 text-amber-400" />
-                            Enter Your Shift Details
+                            Enter 24h shift times (e.g., 22:00 - 06:00)
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-6">
@@ -157,7 +163,7 @@ export default function RosterToSleepPage() {
                                 disabled={!isFormValid || isLoading}
                                 className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                {isLoading ? "Generating…" : "Generate Plan"}
+                                {isLoading ? "Generating…" : "Generate Protocol"}
                             </Button>
                             <Button
                                 type="button"
@@ -178,7 +184,7 @@ export default function RosterToSleepPage() {
                 {/* Results Section */}
                 <Card className="bg-slate-900/80 border-slate-800">
                     <CardHeader>
-                        <CardTitle className="text-white">Your Sleep & Caffeine Plan</CardTitle>
+                        <CardTitle className="text-white">Your Protocol</CardTitle>
                     </CardHeader>
                     <CardContent>
                         {isLoading ? (
@@ -196,7 +202,7 @@ export default function RosterToSleepPage() {
                             <div className="space-y-8">
                                 {/* Summary Header */}
                                 <div className="text-center space-y-2">
-                                    <p className="text-slate-300">Here&apos;s your suggested sleep & caffeine plan around this shift.</p>
+                                    <p className="text-slate-300">Here is the timeline for your Anchor Light (cortisol reset), Adenosine Clearance, and Pancreas &quot;Off&quot; Zones.</p>
                                     <div className="inline-flex items-center gap-2 bg-slate-800 rounded-lg px-4 py-2">
                                         <span className="text-slate-400">Shift:</span>
                                         <span className="font-mono text-white">
@@ -242,22 +248,7 @@ export default function RosterToSleepPage() {
                 {/* Lead Capture CTA */}
                 <LeadCapture />
 
-                {/* Footer */}
-                <footer className="text-center text-sm text-slate-600 pb-8">
-                    Built with ❤️ for shift workers everywhere by
-                    {" "}
-                    <a
-                        href="https://www.ascendai.site"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-slate-300 hover:text-white underline underline-offset-4"
-                        onClick={() => {
-                            posthog.capture("clicked-company-link")
-                        }}
-                    >
-                        Ascend AI
-                    </a>
-                </footer>
+
             </div>
         </div>
     )
