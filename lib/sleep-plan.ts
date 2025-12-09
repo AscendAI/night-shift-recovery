@@ -7,29 +7,33 @@ export interface TimeSlot {
 }
 
 export interface SleepPlan {
-  shiftStart: number
-  shiftEnd: number
-  shiftStartTime: string
-  shiftEndTime: string
-  shiftDurationHours: number
-  anchorNap: TimeSlot
+  targetWakeTime: string
+  targetSleepTime: string
+  // Optional shift times for reference/visualization
+  shiftStart?: string
+  shiftEnd?: string
+
+  // Protocol Windows
+  lightAnchor: TimeSlot
   caffeineWindow: TimeSlot
   caffeineCutoff: string
-  sunglasses: TimeSlot
+  nadirDip: TimeSlot
+  vampireMode: TimeSlot
   mainSleep: TimeSlot
+
+  // Metabolic Traffic Light
   metabolic: {
     green: TimeSlot
     yellow: TimeSlot
     red: TimeSlot
   }
-  vampireMode: TimeSlot
 }
 
 export interface TimelineSegment {
   label: string
   startMinutes: number
   endMinutes: number
-  type: "sleep" | "caffeine" | "work" | "light-control" | "metabolic-green" | "metabolic-yellow" | "metabolic-red" | "vampire-mode"
+  type: "sleep" | "caffeine" | "work" | "light-control" | "metabolic-green" | "metabolic-yellow" | "metabolic-red" | "vampire-mode" | "nadir"
 }
 
 // Parse time string (HH:mm) to minutes from midnight
@@ -47,113 +51,97 @@ export function minutesToTime(minutes: number): string {
   return `${hours.toString().padStart(2, "0")}:${mins.toString().padStart(2, "0")}`
 }
 
-// Generate the sleep plan based on shift times
-export function generatePlan(shiftStartTime: string, shiftEndTime: string): SleepPlan {
-  const shiftStartMinutes = parseTimeToMinutes(shiftStartTime)
-  let shiftEndMinutes = parseTimeToMinutes(shiftEndTime)
+/**
+ * THE UNIVERSAL CIRCADIAN HEURISTIC (T-Wake Algorithm)
+ * 
+ * Logic Pivot:
+ * - Old: Shift-Relative (Shift Start -> Action)
+ * - New: Wake-Relative (Wake Time -> Action)
+ * 
+ * Core Formula:
+ * - Wake Time (T-Wake) is the Anchor.
+ * - Sleep Pressure builds for ~16 hours.
+ * - Sleep Start = T-Wake + 16 hours.
+ */
+export function generatePlan(
+  targetWakeTimeStr: string,
+  shiftStartStr?: string,
+  shiftEndStr?: string
+): SleepPlan {
+  // 1. ANCHOR: The user wakes up here.
+  const wakeMinutes = parseTimeToMinutes(targetWakeTimeStr)
 
-  // Handle shifts crossing midnight
-  if (shiftEndMinutes <= shiftStartMinutes) {
-    shiftEndMinutes += 1440 // Add 24 hours in minutes
-  }
+  // 2. SLEEP START: 16 hours after waking (Standard Adenosine Load)
+  // 16 hours * 60 minutes = 960 minutes
+  const sleepStartMinutes = wakeMinutes + 960
 
-  const shiftDurationMinutes = shiftEndMinutes - shiftStartMinutes
-  const shiftDurationHours = shiftDurationMinutes / 60
+  // Sleep Duration: 8 hours (standard)
+  // 8 hours * 60 minutes = 480 minutes
+  const sleepEndMinutes = sleepStartMinutes + 480
 
-  // Anchor Nap: 90 minutes, ending 2 hours before shift start
-  const anchorNapEnd = shiftStartMinutes - 120 // 2 hours before shift
-  const anchorNapStart = anchorNapEnd - 90 // 90 minutes duration
+  // --- PROTOCOL WINDOWS ---
 
-  // Main Sleep: starts 1 hour after shift ends, 7 hours duration
-  const mainSleepStart = shiftEndMinutes + 60
-  const mainSleepEnd = mainSleepStart + 420 // 7 hours
+  // 1. Light Anchor: Immediate cortisol spike (Wake to +60m)
+  const lightStart = wakeMinutes
+  const lightEnd = wakeMinutes + 60
 
-  // Caffeine Window: Ends 6 hours before main sleep
-  // "Hard Stop" alarm sounds 6 hours before sleep
-  const caffeineCutoffMinutes = mainSleepStart - 360
-  const caffeineStart = shiftStartMinutes
-  // Ensure caffeine window doesn't start after it ends (unlikely but safe)
-  const caffeineEnd = Math.max(caffeineStart, caffeineCutoffMinutes)
+  // 2. Caffeine: Delay 90m, Stop 10h before sleep
+  // Start: Wake + 90m
+  // End: Sleep Start - 10h (600m)
+  const caffeineStart = wakeMinutes + 90
+  const caffeineEnd = sleepStartMinutes - 600
 
-  // Vampire Mode: 30 minutes before shift ends
-  const vampireStart = shiftEndMinutes - 30
-  const vampireEnd = mainSleepStart // Until sleep starts
+  // 3. Nadir Dip: The afternoon crash (6-7 hours after wake)
+  // Used for NSDR or 20 min nap
+  const nadirStart = wakeMinutes + 360 // Wake + 6h
+  const nadirEnd = nadirStart + 20 // 20 min duration
 
-  // Metabolic Traffic Light
-  // Red: 3 hours before sleep (FASTING MODE)
-  const metabolicRedStart = mainSleepStart - 180
-  const metabolicRedEnd = mainSleepStart
+  // 4. Vampire Mode: 2 hours before sleep
+  const vampireStart = sleepStartMinutes - 120
+  const vampireEnd = sleepStartMinutes
 
-  // Yellow: Middle of shift to Red
-  const shiftMiddle = shiftStartMinutes + Math.floor(shiftDurationMinutes / 2)
-  const metabolicYellowStart = shiftMiddle
-  const metabolicYellowEnd = metabolicRedStart
+  // 5. Metabolic Traffic Light
+  // Green: Wake to +8 hours
+  const metabolicGreenStart = wakeMinutes
+  const metabolicGreenEnd = wakeMinutes + 480
 
-  // Green: Start of wake window (approx anchor nap end or before shift) to Yellow
-  // Let's say it starts when you wake up for the "day", e.g. Anchor Nap end
-  const metabolicGreenStart = anchorNapEnd
-  const metabolicGreenEnd = metabolicYellowStart
+  // Yellow: +8 hours to Sleep Start - 3 hours
+  const metabolicYellowStart = metabolicGreenEnd
+  const metabolicYellowEnd = sleepStartMinutes - 180
 
-  // Sunglasses: Old logic kept for compatibility but Vampire Mode supersedes
-  const sunglassesStart = shiftEndMinutes
-  const sunglassesEnd = shiftEndMinutes + 60
+  // Red (Fasting): Sleep Start - 3 hours to Sleep Start
+  const metabolicRedStart = metabolicYellowEnd
+  const metabolicRedEnd = sleepStartMinutes
+
+  // Helper to create TimeSlot
+  const createSlot = (s: number, e: number): TimeSlot => ({
+    startMinutes: s,
+    endMinutes: e,
+    startTime: minutesToTime(s),
+    endTime: minutesToTime(e)
+  })
 
   return {
-    shiftStart: shiftStartMinutes,
-    shiftEnd: shiftEndMinutes,
-    shiftStartTime: minutesToTime(shiftStartMinutes),
-    shiftEndTime: minutesToTime(shiftEndMinutes),
-    shiftDurationHours: Math.round(shiftDurationHours * 10) / 10,
-    anchorNap: {
-      startMinutes: anchorNapStart,
-      endMinutes: anchorNapEnd,
-      startTime: minutesToTime(anchorNapStart),
-      endTime: minutesToTime(anchorNapEnd),
-    },
-    caffeineWindow: {
-      startMinutes: caffeineStart,
-      endMinutes: caffeineEnd,
-      startTime: minutesToTime(caffeineStart),
-      endTime: minutesToTime(caffeineEnd),
-    },
+    targetWakeTime: targetWakeTimeStr,
+    targetSleepTime: minutesToTime(sleepStartMinutes),
+    shiftStart: shiftStartStr,
+    shiftEnd: shiftEndStr,
+
+    lightAnchor: createSlot(lightStart, lightEnd),
+
+    caffeineWindow: createSlot(caffeineStart, caffeineEnd),
     caffeineCutoff: minutesToTime(caffeineEnd),
-    sunglasses: {
-      startMinutes: sunglassesStart,
-      endMinutes: sunglassesEnd,
-      startTime: minutesToTime(sunglassesStart),
-      endTime: minutesToTime(sunglassesEnd),
-    },
-    mainSleep: {
-      startMinutes: mainSleepStart,
-      endMinutes: mainSleepEnd,
-      startTime: minutesToTime(mainSleepStart),
-      endTime: minutesToTime(mainSleepEnd),
-    },
+
+    nadirDip: createSlot(nadirStart, nadirEnd),
+
+    vampireMode: createSlot(vampireStart, vampireEnd),
+
+    mainSleep: createSlot(sleepStartMinutes, sleepEndMinutes),
+
     metabolic: {
-      green: {
-        startMinutes: metabolicGreenStart,
-        endMinutes: metabolicGreenEnd,
-        startTime: minutesToTime(metabolicGreenStart),
-        endTime: minutesToTime(metabolicGreenEnd),
-      },
-      yellow: {
-        startMinutes: metabolicYellowStart,
-        endMinutes: metabolicYellowEnd,
-        startTime: minutesToTime(metabolicYellowStart),
-        endTime: minutesToTime(metabolicYellowEnd),
-      },
-      red: {
-        startMinutes: metabolicRedStart,
-        endMinutes: metabolicRedEnd,
-        startTime: minutesToTime(metabolicRedStart),
-        endTime: minutesToTime(metabolicRedEnd),
-      }
-    },
-    vampireMode: {
-      startMinutes: vampireStart,
-      endMinutes: vampireEnd,
-      startTime: minutesToTime(vampireStart),
-      endTime: minutesToTime(vampireEnd),
+      green: createSlot(metabolicGreenStart, metabolicGreenEnd),
+      yellow: createSlot(metabolicYellowStart, metabolicYellowEnd),
+      red: createSlot(metabolicRedStart, metabolicRedEnd)
     }
   }
 }
@@ -164,118 +152,102 @@ export function generateTimelineSegments(plan: SleepPlan): {
   timelineStart: number
   timelineEnd: number
 } {
-  // Use a 24h window anchored around the shift: 8h before to 16h after
-  const timelineStart = plan.shiftStart - 480
+  // Use a 24h window anchored around Wake Time
+  // Start 2 hours before wake for context
+  const timelineStart = parseTimeToMinutes(plan.targetWakeTime) - 120
   const timelineEnd = timelineStart + 1440
-  const cycle = timelineEnd - timelineStart
+  const cycle = 1440 // 24 hours
 
   const baseSegments: TimelineSegment[] = [
-    {
-      label: "Anchor Nap",
-      startMinutes: plan.anchorNap.startMinutes,
-      endMinutes: plan.anchorNap.endMinutes,
-      type: "sleep",
-    },
-    {
-      label: "Shift",
-      startMinutes: plan.shiftStart,
-      endMinutes: plan.shiftEnd,
-      type: "work",
-    },
-    {
-      label: "Caffeine OK",
-      startMinutes: plan.caffeineWindow.startMinutes,
-      endMinutes: plan.caffeineWindow.endMinutes,
-      type: "caffeine",
-    },
-    // Metabolic Segments
-    {
-      label: "Eat Complex Carbs",
-      startMinutes: plan.metabolic.green.startMinutes,
-      endMinutes: plan.metabolic.green.endMinutes,
-      type: "metabolic-green",
-    },
-    {
-      label: "Protein/Fats Only",
-      startMinutes: plan.metabolic.yellow.startMinutes,
-      endMinutes: plan.metabolic.yellow.endMinutes,
-      type: "metabolic-yellow",
-    },
-    {
-      label: "FASTING MODE",
-      startMinutes: plan.metabolic.red.startMinutes,
-      endMinutes: plan.metabolic.red.endMinutes,
-      type: "metabolic-red",
-    },
-    // Vampire Mode
-    {
-      label: "Vampire Mode (Sunglasses)",
-      startMinutes: plan.vampireMode.startMinutes,
-      endMinutes: plan.vampireMode.endMinutes,
-      type: "vampire-mode",
-    },
+    // Shift (Visual Only) - If provided
+    ...(plan.shiftStart && plan.shiftEnd ? [{
+      label: "Work Shift",
+      startMinutes: parseTimeToMinutes(plan.shiftStart),
+      endMinutes: parseTimeToMinutes(plan.shiftEnd) <= parseTimeToMinutes(plan.shiftStart)
+        ? parseTimeToMinutes(plan.shiftEnd) + 1440
+        : parseTimeToMinutes(plan.shiftEnd),
+      type: "work" as const,
+    }] : []),
+
+    // Main Sleep
     {
       label: "Main Sleep",
       startMinutes: plan.mainSleep.startMinutes,
       endMinutes: plan.mainSleep.endMinutes,
       type: "sleep",
     },
-  ]
 
+    // Caffeine
+    {
+      label: "Caffeine OK",
+      startMinutes: plan.caffeineWindow.startMinutes,
+      endMinutes: plan.caffeineWindow.endMinutes,
+      type: "caffeine",
+    },
+
+    // Nadir Dip
+    {
+      label: "Nadir Dip (Nap/NSDR)",
+      startMinutes: plan.nadirDip.startMinutes,
+      endMinutes: plan.nadirDip.endMinutes,
+      type: "nadir",
+    },
+
+    // Light Anchor
+    {
+      label: "Light Anchor",
+      startMinutes: plan.lightAnchor.startMinutes,
+      endMinutes: plan.lightAnchor.endMinutes,
+      type: "light-control"
+    },
+
+    // Vampire Mode
+    {
+      label: "Vampire Mode (Darkness)",
+      startMinutes: plan.vampireMode.startMinutes,
+      endMinutes: plan.vampireMode.endMinutes,
+      type: "vampire-mode",
+    },
+
+    // Metabolic
+    {
+      label: "Green: Complex Carbs",
+      startMinutes: plan.metabolic.green.startMinutes,
+      endMinutes: plan.metabolic.green.endMinutes,
+      type: "metabolic-green",
+    },
+    {
+      label: "Yellow: Protein/Fats",
+      startMinutes: plan.metabolic.yellow.startMinutes,
+      endMinutes: plan.metabolic.yellow.endMinutes,
+      type: "metabolic-yellow",
+    },
+    {
+      label: "Red: Fasting",
+      startMinutes: plan.metabolic.red.startMinutes,
+      endMinutes: plan.metabolic.red.endMinutes,
+      type: "metabolic-red",
+    },
+  ]
 
   const wrapped: TimelineSegment[] = []
 
+  // Reuse robust wrapping logic
   for (const seg of baseSegments) {
     let s = seg.startMinutes - timelineStart
     let e = seg.endMinutes - timelineStart
 
-    // Normalize into [0, cycle)
-    while (s < 0) {
-      s += cycle
-      e += cycle
-    }
-    while (s >= cycle) {
-      s -= cycle
-      e -= cycle
-    }
+    // Normalize to bring s within reasonable range of [0, cycle]
+    while (s < 0) { s += cycle; e += cycle; }
+    while (s >= cycle) { s -= cycle; e -= cycle; }
 
-    // If segment extends past the cycle boundary, split
-    if (e > cycle) {
-      const first: TimelineSegment = {
-        label: seg.label,
-        type: seg.type,
-        startMinutes: timelineStart + s,
-        endMinutes: timelineStart + cycle,
-      }
-      const second: TimelineSegment = {
-        label: seg.label,
-        type: seg.type,
-        startMinutes: timelineStart + 0,
-        endMinutes: timelineStart + (e - cycle),
-      }
-      wrapped.push(first, second)
-    } else if (e <= s) {
-      // Crosses boundary due to modulo wrap
-      const first: TimelineSegment = {
-        label: seg.label,
-        type: seg.type,
-        startMinutes: timelineStart + s,
-        endMinutes: timelineStart + cycle,
-      }
-      const second: TimelineSegment = {
-        label: seg.label,
-        type: seg.type,
-        startMinutes: timelineStart + 0,
-        endMinutes: timelineStart + e,
-      }
-      wrapped.push(first, second)
-    } else {
-      wrapped.push({
-        label: seg.label,
-        type: seg.type,
-        startMinutes: timelineStart + s,
-        endMinutes: timelineStart + e,
-      })
+    if (e <= cycle) {
+      wrapped.push({ ...seg, startMinutes: timelineStart + s, endMinutes: timelineStart + e })
+    }
+    else {
+      wrapped.push({ ...seg, startMinutes: timelineStart + s, endMinutes: timelineStart + cycle })
+      const remainder = e - cycle
+      wrapped.push({ ...seg, startMinutes: timelineStart, endMinutes: timelineStart + remainder })
     }
   }
 

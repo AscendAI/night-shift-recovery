@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import { Moon, RotateCcw, Zap } from "lucide-react"
+import { Moon, RotateCcw, Zap, Sun } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -15,6 +15,7 @@ import { generatePlan, generateTimelineSegments, parseTimeToMinutes, type SleepP
 import posthog from "posthog-js"
 
 export default function RosterToSleepPage() {
+    const [wakeTime, setWakeTime] = useState("")
     const [shiftStart, setShiftStart] = useState("")
     const [shiftEnd, setShiftEnd] = useState("")
     const [plan, setPlan] = useState<SleepPlan | null>(null)
@@ -22,32 +23,30 @@ export default function RosterToSleepPage() {
     const [isLoading, setIsLoading] = useState(false)
 
     const isFormValid = useMemo(() => {
-        return shiftStart.trim() !== "" && shiftEnd.trim() !== ""
-    }, [shiftStart, shiftEnd])
+        return wakeTime.trim() !== ""
+    }, [wakeTime])
 
     const handleGeneratePlan = () => {
         setError("")
         setPlan(null)
 
-        if (!shiftStart || !shiftEnd) {
-            setError("Please enter both shift start and end times.")
+        if (!wakeTime) {
+            setError("Please enter your target wake time.")
             return
         }
 
-        const startMinutes = parseTimeToMinutes(shiftStart)
-        const endMinutes = parseTimeToMinutes(shiftEnd)
-
-        // Check for same start and end time
-        if (startMinutes === endMinutes) {
-            setError("Shift start and end times cannot be the same.")
+        // Validate shift details if provided
+        if ((shiftStart && !shiftEnd) || (!shiftStart && shiftEnd)) {
+            setError("Please provide both Shift Start and Shift End, or leave both blank.")
             return
         }
 
-        const delayMs = 3000 + Math.floor(Math.random() * 2000)
+        const delayMs = 2000 + Math.floor(Math.random() * 1000)
         setIsLoading(true)
 
         // Track shift details submission
-        posthog.capture('shift_details_submitted', {
+        posthog.capture('wake_plan_submitted', {
+            wakeTime,
             shiftStart,
             shiftEnd,
             timestamp: new Date().toISOString()
@@ -55,14 +54,13 @@ export default function RosterToSleepPage() {
 
         setTimeout(() => {
             try {
-                const generatedPlan = generatePlan(shiftStart, shiftEnd)
+                // Shift times are optional now
+                const generatedPlan = generatePlan(wakeTime, shiftStart || undefined, shiftEnd || undefined)
                 setPlan(generatedPlan)
 
                 // Track successful plan generation
                 posthog.capture('sleep_plan_generated', {
-                    shiftStart,
-                    shiftEnd,
-                    shiftDurationHours: generatedPlan.shiftDurationHours,
+                    wakeTime,
                     timestamp: new Date().toISOString()
                 })
             } catch {
@@ -70,8 +68,7 @@ export default function RosterToSleepPage() {
 
                 // Track plan generation error
                 posthog.capture('sleep_plan_error', {
-                    shiftStart,
-                    shiftEnd,
+                    wakeTime,
                     timestamp: new Date().toISOString()
                 })
             } finally {
@@ -81,6 +78,7 @@ export default function RosterToSleepPage() {
     }
 
     const handleReset = () => {
+        setWakeTime("")
         setShiftStart("")
         setShiftEnd("")
         setPlan(null)
@@ -100,9 +98,9 @@ export default function RosterToSleepPage() {
                     <div className="inline-flex items-center justify-center w-16 h-16 bg-indigo-500/20 rounded-2xl mb-4">
                         <Moon className="w-8 h-8 text-indigo-400" />
                     </div>
-                    <h1 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">Circadian Entrainment Tool (T-min Based)</h1>
+                    <h1 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">Unified Circadian Protocol (T-Wake)</h1>
                     <p className="text-lg text-slate-400 max-w-xl mx-auto text-pretty">
-                        I couldn&apos;t find a calculator that actually used the &quot;Temperature Minimum&quot; protocol from the Jet Lag episodes, so I coded one. It calculates your specific Light, Caffeine, and Fasting windows to mitigate metabolic damage.
+                        A bio-optimization tool that uses your "Wake Time" anchor to align your light, caffeine, and fasting windows. Works for Night Shift, Navy SEALs, and New Parents alike.
                     </p>
                     <div className="mt-8 aspect-video w-full max-w-xl mx-auto rounded-xl overflow-hidden shadow-lg border border-slate-800">
                         <iframe
@@ -119,16 +117,43 @@ export default function RosterToSleepPage() {
                 <Card className="bg-slate-900/80 border-slate-800">
                     <CardHeader>
                         <CardTitle className="text-white flex items-center gap-2">
-                            <Zap className="w-5 h-5 text-amber-400" />
-                            Enter 24h shift times (e.g., 22:00 - 06:00)
+                            <Sun className="w-5 h-5 text-amber-400" />
+                            Input your Target Wake Time
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-6">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+                        {/* Wake Time (Primary) */}
+                        <div className="space-y-2">
+                            <Label htmlFor="wake-time" className="text-slate-300 text-lg">
+                                When do you need to wake up? <span className="text-red-400">*</span>
+                            </Label>
+                            <Input
+                                id="wake-time"
+                                type="time"
+                                value={wakeTime}
+                                onChange={(e) => setWakeTime(e.target.value)}
+                                className="bg-slate-800 border-indigo-500/50 text-white h-12 text-lg"
+                            />
+                            <p className="text-xs text-slate-500">
+                                This is your "Cortisol Anchor." Everything is calculated from here.
+                            </p>
+                        </div>
+
+                        <div className="relative">
+                            <div className="absolute inset-0 flex items-center">
+                                <span className="w-full border-t border-slate-800" />
+                            </div>
+                            <div className="relative flex justify-center text-xs uppercase">
+                                <span className="bg-slate-900 px-2 text-slate-500">Optional: Add Work Shift Context</span>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 opacity-80 hover:opacity-100 transition-opacity">
                             {/* Shift Start Time */}
                             <div className="space-y-2">
-                                <Label htmlFor="shift-start" className="text-slate-300">
-                                    Shift Start Time <span className="text-red-400">*</span>
+                                <Label htmlFor="shift-start" className="text-slate-400">
+                                    Shift Start (Optional)
                                 </Label>
                                 <Input
                                     id="shift-start"
@@ -137,13 +162,12 @@ export default function RosterToSleepPage() {
                                     onChange={(e) => setShiftStart(e.target.value)}
                                     className="bg-slate-800 border-slate-700 text-white"
                                 />
-                                <p className="text-xs text-slate-500">Use 24-hour format</p>
                             </div>
 
                             {/* Shift End Time */}
                             <div className="space-y-2">
-                                <Label htmlFor="shift-end" className="text-slate-300">
-                                    Shift End Time <span className="text-red-400">*</span>
+                                <Label htmlFor="shift-end" className="text-slate-400">
+                                    Shift End (Optional)
                                 </Label>
                                 <Input
                                     id="shift-end"
@@ -152,7 +176,6 @@ export default function RosterToSleepPage() {
                                     onChange={(e) => setShiftEnd(e.target.value)}
                                     className="bg-slate-800 border-slate-700 text-white"
                                 />
-                                <p className="text-xs text-slate-500">Shifts crossing midnight are handled automatically</p>
                             </div>
                         </div>
 
@@ -161,15 +184,15 @@ export default function RosterToSleepPage() {
                             <Button
                                 onClick={handleGeneratePlan}
                                 disabled={!isFormValid || isLoading}
-                                className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white disabled:opacity-50 disabled:cursor-not-allowed h-12 text-base"
                             >
-                                {isLoading ? "Generating…" : "Generate Protocol"}
+                                {isLoading ? "Optimizing..." : "Generate Bio-Protocol"}
                             </Button>
                             <Button
                                 type="button"
                                 variant="ghost"
                                 onClick={handleReset}
-                                className="text-slate-400 hover:text-white hover:bg-slate-800"
+                                className="text-slate-400 hover:text-white hover:bg-slate-800 h-12"
                             >
                                 <RotateCcw className="w-4 h-4 mr-2" />
                                 Reset
@@ -184,31 +207,31 @@ export default function RosterToSleepPage() {
                 {/* Results Section */}
                 <Card className="bg-slate-900/80 border-slate-800">
                     <CardHeader>
-                        <CardTitle className="text-white">Your Protocol</CardTitle>
+                        <CardTitle className="text-white">Your Optimization Protocol</CardTitle>
                     </CardHeader>
                     <CardContent>
                         {isLoading ? (
                             <div className="text-center py-16 text-slate-400">
                                 <Spinner className="w-10 h-10 mx-auto mb-4 text-indigo-400" />
-                                <p>Generating your sleep & caffeine plan…</p>
-                                <p className="text-xs text-slate-500 mt-2">This takes a few seconds.</p>
+                                <p>Calculating Adenosine & Cortisol timing...</p>
                             </div>
                         ) : !plan ? (
                             <div className="text-center py-12 text-slate-500">
                                 <Moon className="w-12 h-12 mx-auto mb-4 opacity-30" />
-                                <p>Enter your shift above and click &quot;Generate Plan&quot; to see your sleep + caffeine timeline.</p>
+                                <p>Enter your Wake Time above to see your optimized schedule.</p>
                             </div>
                         ) : (
                             <div className="space-y-8">
                                 {/* Summary Header */}
                                 <div className="text-center space-y-2">
-                                    <p className="text-slate-300">Here is the timeline for your Anchor Light (cortisol reset), Adenosine Clearance, and Pancreas &quot;Off&quot; Zones.</p>
+                                    <p className="text-slate-300">
+                                        Your biologically optimized schedule, anchored to your <strong>{plan.targetWakeTime}</strong> wake time.
+                                    </p>
                                     <div className="inline-flex items-center gap-2 bg-slate-800 rounded-lg px-4 py-2">
-                                        <span className="text-slate-400">Shift:</span>
-                                        <span className="font-mono text-white">
-                                            {plan.shiftStartTime} → {plan.shiftEndTime}
+                                        <span className="text-slate-400">Target Sleep:</span>
+                                        <span className="font-mono text-white text-lg">
+                                            {plan.targetSleepTime}
                                         </span>
-                                        <span className="text-slate-500">({plan.shiftDurationHours} hours)</span>
                                     </div>
                                 </div>
 
@@ -217,7 +240,7 @@ export default function RosterToSleepPage() {
 
                                 {/* Bullet Plan */}
                                 <div className="space-y-3">
-                                    <h4 className="text-sm font-medium text-slate-400 uppercase tracking-wide">Step-by-Step Plan</h4>
+                                    <h4 className="text-sm font-medium text-slate-400 uppercase tracking-wide">Step-by-Step Protocol</h4>
                                     <BulletPlan plan={plan} />
                                 </div>
 
@@ -232,14 +255,6 @@ export default function RosterToSleepPage() {
                                         />
                                     </div>
                                 )}
-
-                                {/* Disclaimer */}
-                                <div className="bg-slate-800/50 rounded-lg p-4 text-center">
-                                    <p className="text-xs text-slate-500">
-                                        This is a heuristic tool based on general sleep science principles and is not medical advice.
-                                        Consult a healthcare provider for personalized guidance.
-                                    </p>
-                                </div>
                             </div>
                         )}
                     </CardContent>

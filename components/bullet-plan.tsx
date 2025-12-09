@@ -1,7 +1,7 @@
 "use client"
 
 import type { SleepPlan } from "@/lib/sleep-plan"
-import { Coffee, Moon, Sun, Glasses, AlertTriangle, Clock, Utensils } from "lucide-react"
+import { Coffee, Moon, Sun, Glasses, AlertTriangle, Clock, Utensils, Battery, Zap } from "lucide-react"
 
 interface BulletPlanProps {
   plan: SleepPlan
@@ -10,39 +10,46 @@ interface BulletPlanProps {
 export function BulletPlan({ plan }: BulletPlanProps) {
   const bullets = [
     {
-      time: `${plan.anchorNap.startTime} – ${plan.anchorNap.endTime}`,
-      icon: Moon,
-      iconColor: "text-indigo-400",
-      title: "Anchor Nap",
-      description: 'Take a 90-minute nap to "bank" sleep before your shift.',
+      time: `${plan.lightAnchor.startTime} – ${plan.lightAnchor.endTime}`,
+      icon: Sun,
+      iconColor: "text-amber-400",
+      title: "Wake & Light Anchor",
+      description: "Get bright light immediately (outdoor or artificial) to spike Cortisol.",
     },
     {
       time: plan.metabolic.green.startTime,
       icon: Utensils,
       iconColor: "text-green-400",
-      title: "Green Zone: Eat Complex Carbs",
-      description: "Start your wake window with slow-release energy.",
+      title: "Green Zone: Complex Carbs",
+      description: "Eat your carbs early in the day when insulin sensitivity is highest.",
     },
     {
-      time: plan.shiftStartTime,
-      icon: Clock,
+      time: plan.caffeineWindow.startTime,
+      icon: Coffee,
       iconColor: "text-amber-400",
-      title: "Shift Starts",
-      description: "Begin your work shift.",
+      title: "Caffeine Unlock (90m Delay)",
+      description: "Allowed to start caffeine now. (Adenosine has cleared naturally).",
+    },
+    {
+      time: `${plan.nadirDip.startTime} – ${plan.nadirDip.endTime}`,
+      icon: Battery,
+      iconColor: "text-indigo-400",
+      title: "Nadir Dip (NSDR / Nap)",
+      description: "Natural energy drop. Do 20 min Nap or NSDR (Non-Sleep Deep Rest). No heavy work.",
     },
     {
       time: plan.metabolic.yellow.startTime,
       icon: Utensils,
       iconColor: "text-yellow-400",
       title: "Yellow Zone: Protein & Fats",
-      description: "Switch to protein and healthy fats to sustain energy without the crash.",
+      description: "Switch to protein/fats. Stop carbs to prepare for sleep mode.",
     },
     {
       time: plan.caffeineCutoff,
       icon: AlertTriangle,
       iconColor: "text-red-400",
       title: "CAFFEINE HARD STOP",
-      description: "No more coffee. 6 hours before sleep to prevent 'tired but wired'.",
+      description: "10 hours before sleep. Zero caffeine from this point onwards.",
       highlight: true,
     },
     {
@@ -50,22 +57,22 @@ export function BulletPlan({ plan }: BulletPlanProps) {
       icon: Utensils,
       iconColor: "text-red-400",
       title: "Red Zone: FASTING MODE",
-      description: "Stop eating 3 hours before sleep to avoid bloating and improve rest.",
+      description: "Stop eating 3 hours before sleep to avoid digestion interfering with Deep Sleep.",
     },
     {
       time: plan.vampireMode.startTime,
       icon: Glasses,
       iconColor: "text-purple-400",
-      title: "VAMPIRE MODE: Sunglasses ON",
-      description: "Critical! Protect your melatonin production 30 mins before shift ends.",
+      title: "VAMPIRE MODE: Dim Lights",
+      description: "2 hours before sleep. Wear blue-light blockers. Dim screens.",
       highlight: true,
     },
     {
       time: `${plan.mainSleep.startTime} – ${plan.mainSleep.endTime}`,
-      icon: Sun,
+      icon: Moon,
       iconColor: "text-indigo-400",
-      title: "Main Sleep Window",
-      description: "Use blackout curtains, cool room, and phone on Do Not Disturb.",
+      title: "Sleep Opportunity",
+      description: "Cool room (65°F/18°C). Blackout curtains. 7.5+ hours.",
     },
   ]
 
@@ -76,9 +83,8 @@ export function BulletPlan({ plan }: BulletPlanProps) {
         return (
           <div
             key={index}
-            className={`flex gap-4 p-3 rounded-lg ${
-              bullet.highlight ? "bg-red-900/30 border border-red-800/50" : "bg-slate-800/50"
-            }`}
+            className={`flex gap-4 p-3 rounded-lg ${bullet.highlight ? "bg-red-900/30 border border-red-800/50" : "bg-slate-800/50"
+              }`}
           >
             <div className={`flex-shrink-0 mt-0.5 ${bullet.iconColor}`}>
               <Icon className="w-5 h-5" />

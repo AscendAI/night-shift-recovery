@@ -17,17 +17,19 @@ const segmentColors: Record<TimelineSegment["type"], string> = {
     "metabolic-yellow": "bg-yellow-500",
     "metabolic-red": "bg-red-600",
     "vampire-mode": "bg-purple-900",
+    "nadir": "bg-blue-400", // New color for Nadir/Nap
 }
 
 const segmentLabels: Record<TimelineSegment["type"], string> = {
     sleep: "Sleep",
     caffeine: "Caffeine OK",
     work: "Shift",
-    "light-control": "Light Control",
+    "light-control": "Light Anchor",
     "metabolic-green": "Complex Carbs",
     "metabolic-yellow": "Protein/Fats",
     "metabolic-red": "Fasting",
     "vampire-mode": "Vampire Mode",
+    "nadir": "Nadir Nap/NSDR",
 }
 
 export function Timeline({ segments, timelineStart, timelineEnd }: TimelineProps) {
@@ -42,8 +44,10 @@ export function Timeline({ segments, timelineStart, timelineEnd }: TimelineProps
     }
 
     // Split segments into tracks
-    const scheduleSegments = segments.filter(s => ["sleep", "work"].includes(s.type))
+    // Schedule: Sleep, Work, Nadir (Nap)
+    const scheduleSegments = segments.filter(s => ["sleep", "work", "nadir"].includes(s.type))
     const metabolicSegments = segments.filter(s => s.type.startsWith("metabolic"))
+    // Protocol: Caffeine, Light, Vampire
     const protocolSegments = segments.filter(s => ["caffeine", "vampire-mode", "light-control"].includes(s.type))
 
     const renderTrack = (trackSegments: TimelineSegment[], heightClass: string = "h-8") => (
@@ -77,7 +81,7 @@ export function Timeline({ segments, timelineStart, timelineEnd }: TimelineProps
     return (
         <div className="space-y-6">
             <div className="space-y-2">
-                <h5 className="text-xs font-medium text-slate-400 uppercase">Schedule (Sleep & Work)</h5>
+                <h5 className="text-xs font-medium text-slate-400 uppercase">Schedule (Sleep, Work, Nap)</h5>
                 {renderTrack(scheduleSegments, "h-10")}
             </div>
 

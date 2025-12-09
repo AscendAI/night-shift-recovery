@@ -16,14 +16,14 @@ export function Dashboard({ plan }: DashboardProps) {
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-medium text-slate-400 flex items-center gap-2">
             <Utensils className="w-4 h-4" />
-            Metabolic Traffic Light
+            Metabolic Zones
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="flex items-center gap-3">
             <div className="w-3 h-3 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]" />
             <div>
-              <p className="text-sm font-medium text-white">Complex Carbs</p>
+              <p className="text-sm font-medium text-white">Carbs OK</p>
               <p className="text-xs text-slate-400">{plan.metabolic.green.startTime} - {plan.metabolic.green.endTime}</p>
             </div>
           </div>
@@ -37,7 +37,7 @@ export function Dashboard({ plan }: DashboardProps) {
           <div className="flex items-center gap-3">
             <div className="w-3 h-3 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]" />
             <div>
-              <p className="text-sm font-medium text-red-400">FASTING MODE</p>
+              <p className="text-sm font-medium text-red-400">FASTING</p>
               <p className="text-xs text-slate-400">{plan.metabolic.red.startTime} - {plan.metabolic.red.endTime}</p>
             </div>
           </div>
@@ -58,9 +58,9 @@ export function Dashboard({ plan }: DashboardProps) {
         <CardContent>
           <div className="mt-2">
             <span className="text-3xl font-bold text-white block">{plan.caffeineCutoff}</span>
-            <p className="text-sm text-red-400 mt-1 font-medium">6 hours before sleep</p>
+            <p className="text-sm text-red-400 mt-1 font-medium">10 hours before sleep</p>
             <p className="text-xs text-slate-500 mt-3">
-              Prevents "tired but wired" feeling. No coffee, tea, or energy drinks after this time.
+              Adenosine receptors must clear before bed. Zero caffeine/chocolate/soda past this point.
             </p>
           </div>
         </CardContent>
@@ -80,9 +80,9 @@ export function Dashboard({ plan }: DashboardProps) {
         <CardContent>
           <div className="mt-2">
             <span className="text-3xl font-bold text-white block">{plan.vampireMode.startTime}</span>
-            <p className="text-sm text-purple-400 mt-1 font-medium">Put on sunglasses NOW</p>
+            <p className="text-sm text-purple-400 mt-1 font-medium">2 hours before sleep</p>
             <p className="text-xs text-slate-500 mt-3">
-              Critical alert 30 mins before shift ends. Protect melatonin for your commute.
+              Dim lights to 50%. Wear blue-blockers. If driving home, wear sunglasses. Melatonin is fragile.
             </p>
           </div>
         </CardContent>
