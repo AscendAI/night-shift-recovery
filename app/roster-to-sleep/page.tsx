@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Timeline } from "@/components/timeline"
+import { ClockTimeline } from "@/components/clock-timeline"
 import { BulletPlan } from "@/components/bullet-plan"
 import { Dashboard } from "@/components/dashboard"
 import { LeadCapture } from "@/components/lead-capture"
@@ -246,12 +246,10 @@ export default function RosterToSleepPage() {
 
                                 {/* Visual Timeline */}
                                 {timelineData && (
-                                    <div className="space-y-2">
-                                        <h4 className="text-sm font-medium text-slate-400 uppercase tracking-wide">Visual Timeline</h4>
-                                        <Timeline
+                                    <div className="space-y-4 flex flex-col items-center">
+                                        <h4 className="text-sm font-medium text-slate-400 uppercase tracking-wide w-full max-w-lg text-left sm:text-center">24-Hour Protocol Clock</h4>
+                                        <ClockTimeline
                                             segments={timelineData.segments}
-                                            timelineStart={timelineData.timelineStart}
-                                            timelineEnd={timelineData.timelineEnd}
                                         />
                                     </div>
                                 )}
