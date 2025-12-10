@@ -10,7 +10,7 @@ const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title:
-    "Roster → Sleep Calculator | Science-Backed Sleep Plans for Shift Workers",
+    "Get Your Rhythm Back | Science-Backed Sleep Plans for Shift Workers",
   description:
     "Translate your chaotic shift roster into a science-backed sleep and caffeine plan. Built for nurses, night-shift staff, and emergency workers.",
   keywords: [

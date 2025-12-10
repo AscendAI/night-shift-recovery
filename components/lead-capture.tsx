@@ -52,11 +52,16 @@ export function LeadCapture() {
                     <Mail className="w-6 h-6 text-indigo-400" />
                 </div>
 
-                <h3 className="text-xl sm:text-2xl font-bold text-white">Coming Soon</h3>
+                <h3 className="text-xl sm:text-2xl font-bold text-white">Coming Soon: Build the habit, effortlessly.</h3>
 
-                <p className="text-slate-400 max-w-md mx-auto">
-                    I&apos;m turning this logic into an app. Manual calculation is unsustainable long-term. I&apos;m building a tool that syncs this protocol to your calendar automatically and also will send periodic notifications to build the habits and track over time.
-                </p>
+                <div className="space-y-4 max-w-lg mx-auto">
+                    <p className="text-slate-400">
+                        It&apos;s hard to remember these protocols every day. I&apos;m working on a simple app that helps you stay consistent and build the habit by sending periodic reminders and syncing with your calendar.
+                    </p>
+                    <p className="text-slate-400">
+                        You can apply to get early access. I&apos;ll email you when the TestFlight link is ready.
+                    </p>
+                </div>
 
                 {status === "success" ? (
                     <div className="flex items-center justify-center gap-2 text-emerald-400 py-4">
@@ -79,14 +84,14 @@ export function LeadCapture() {
                             />
                         </div>
                         <Button type="submit" className="bg-indigo-600 hover:bg-indigo-700 text-white h-11 px-6">
-                            Join the Waitlist
+                            Join the early access list
                             <ArrowRight className="w-4 h-4 ml-2" />
                         </Button>
                     </form>
                 )}
 
                 {status === "error" && <p className="text-red-400 text-sm">{errorMessage}</p>}
-                <p className="text-xs text-slate-500 mt-2">You can apply to get early access. I&apos;ll email you when the TestFlight link is ready.</p>
+
             </div>
         </div>
     )

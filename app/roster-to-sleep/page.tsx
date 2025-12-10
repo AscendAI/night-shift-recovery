@@ -98,9 +98,9 @@ export default function RosterToSleepPage() {
                     <div className="inline-flex items-center justify-center w-16 h-16 bg-indigo-500/20 rounded-2xl mb-4">
                         <Moon className="w-8 h-8 text-indigo-400" />
                     </div>
-                    <h1 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">Unified Circadian Protocol (T-Wake)</h1>
-                    <p className="text-lg text-slate-400 max-w-xl mx-auto text-pretty">
-                        A bio-optimization tool that uses your "Wake Time" anchor to align your light, caffeine, and fasting windows. Works for Night Shift, Navy SEALs, and New Parents alike.
+                    <h1 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">Get Your Rhythm Back</h1>
+                    <p className="text-lg text-slate-400 max-w-2xl mx-auto text-pretty">
+                        This tool uses the Huberman Lab protocols to calculate the precise windows for peak focus and deep rest, based entirely on when you actually wake up. Whether you&apos;re fixing a messy sleep schedule, recovering from burnout, or just want steady energy throughout the day—following this protocol will help you get your rhythm back.
                     </p>
                     <div className="mt-8 aspect-video w-full max-w-xl mx-auto rounded-xl overflow-hidden shadow-lg border border-slate-800">
                         <iframe
@@ -118,7 +118,7 @@ export default function RosterToSleepPage() {
                     <CardHeader>
                         <CardTitle className="text-white flex items-center gap-2">
                             <Sun className="w-5 h-5 text-amber-400" />
-                            Input your Target Wake Time
+                            What is your goal Wake Time? Start here. We will help you structure the rest of your day.
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-6">
@@ -145,7 +145,7 @@ export default function RosterToSleepPage() {
                                 <span className="w-full border-t border-slate-800" />
                             </div>
                             <div className="relative flex justify-center text-xs uppercase">
-                                <span className="bg-slate-900 px-2 text-slate-500">Optional: Add Work Shift Context</span>
+                                <span className="bg-slate-900 px-2 text-slate-500">Show my work hours (Optional)</span>
                             </div>
                         </div>
 
@@ -207,7 +207,7 @@ export default function RosterToSleepPage() {
                 {/* Results Section */}
                 <Card className="bg-slate-900/80 border-slate-800">
                     <CardHeader>
-                        <CardTitle className="text-white">Your Optimization Protocol</CardTitle>
+                        <CardTitle className="text-white">Your Personal Timeline</CardTitle>
                     </CardHeader>
                     <CardContent>
                         {isLoading ? (
@@ -218,7 +218,7 @@ export default function RosterToSleepPage() {
                         ) : !plan ? (
                             <div className="text-center py-12 text-slate-500">
                                 <Moon className="w-12 h-12 mx-auto mb-4 opacity-30" />
-                                <p>Enter your Wake Time above to see your optimized schedule.</p>
+                                <p>Enter your wake time to see exactly when to fuel up, when to rest, and when to dim the lights.</p>
                             </div>
                         ) : (
                             <div className="space-y-8">
