@@ -56,7 +56,7 @@ export function LeadCapture() {
 
                 <div className="space-y-4 max-w-lg mx-auto">
                     <p className="text-slate-400">
-                        It&apos;s hard to remember these protocols every day. I&apos;m working on a simple app that helps you stay consistent and build the habit by sending periodic reminders and syncing with your calendar.
+                        I&apos;m working on a simple app that helps you stay consistent and build the habit by sending periodic reminders and syncing with your calendar.
                     </p>
                     <p className="text-slate-400">
                         You can apply to get early access. I&apos;ll email you when the TestFlight link is ready.
